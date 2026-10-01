@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>{{이름}} — 경력 포트폴리오</title>
+<style>
+  /* ===== A4 인쇄 규칙 — 수정 금지 ===== */
+  @page { size: A4 portrait; margin: 18mm 18mm 16mm 18mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    font-family: "Malgun Gothic", "맑은 고딕", "Pretendard", sans-serif;
+    font-size: 10.5pt; line-height: 1.55; color: #1a1a2e;
+  }
+  .page-break { page-break-before: always; }
+  .no-break { page-break-inside: avoid; }
+
+  /* ===== 색상: 포인트 1색 ===== */
+  :root { --accent: #1e3a5f; --accent-light: #eef2f7; --gray: #6b7280; }
+
+  h1 { font-size: 22pt; color: var(--accent); letter-spacing: -0.5px; }
+  h2 { /* 섹션 헤더 */
+    font-size: 13pt; color: var(--accent); margin: 18pt 0 8pt;
+    padding-bottom: 4pt; border-bottom: 2px solid var(--accent);
+  }
+  h3 { font-size: 11.5pt; margin: 10pt 0 4pt; }
+  p  { margin-bottom: 6pt; }
+  .muted { color: var(--gray); font-size: 9.5pt; }
+
+  /* ===== 1p: 헤더 ===== */
+  .header { display: flex; justify-content: space-between; align-items: flex-end;
+            border-bottom: 3px solid var(--accent); padding-bottom: 10pt; }
+  .header .title { font-size: 12pt; color: var(--gray); margin-top: 2pt; }
+  .header .contact { text-align: right; font-size: 9.5pt; color: var(--gray); line-height: 1.7; }
+
+  .intro { margin: 12pt 0; font-size: 11pt; }
+
+  /* ===== 1p: KPI 하이라이트 ===== */
+  .kpi-row { display: flex; gap: 10pt; margin: 12pt 0; }
+  .kpi { flex: 1; background: var(--accent-light); border-radius: 6pt;
+         padding: 10pt 8pt; text-align: center; }
+  .kpi .num { font-size: 24pt; font-weight: 700; color: var(--accent); line-height: 1.1; }
+  .kpi .label { font-size: 8.5pt; color: var(--gray); margin-top: 3pt; }
+
+  /* ===== 1p: 핵심 역량 ===== */
+  .strength { margin-bottom: 8pt; }
+  .strength b { color: var(--accent); }
+
+  /* ===== 1p: 타임라인 ===== */
+  .timeline { width: 100%; border-collapse: collapse; margin-top: 4pt; }
+  .timeline td { padding: 3pt 6pt; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  .timeline .period { white-space: nowrap; color: var(--gray); font-size: 9.5pt; width: 90pt; }
+
+  /* ===== 2p: 프로젝트 매트릭스 ===== */
+  table.matrix { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  table.matrix th { text-align: left; padding: 5pt 6pt; border-bottom: 2px solid var(--accent);
+                    color: var(--accent); }
+  table.matrix td { padding: 5pt 6pt; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+
+  /* ===== 3p~: 프로젝트 상세 카드 ===== */
+  .project { margin-bottom: 16pt; }
+  .project .meta { font-size: 9.5pt; color: var(--gray); margin-bottom: 6pt; }
+  .project .block { margin-bottom: 5pt; }
+  .project .block b.tag { display: inline-block; min-width: 40pt; color: var(--accent); }
+  .project .result { background: var(--accent-light); border-left: 3pt solid var(--accent);
+                     padding: 6pt 10pt; margin-top: 6pt; }
+  .project .result .big { font-weight: 700; color: var(--accent); }
+
+  /* ===== 마지막: 스킬/자격 ===== */
+  .tags span { display: inline-block; background: var(--accent-light); border-radius: 3pt;
+               padding: 2pt 8pt; margin: 0 4pt 4pt 0; font-size: 9.5pt; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 1페이지: Executive Summary ==================== -->
+<div class="header no-break">
+  <div>
+    <h1>{{이름}}</h1>
+    <div class="title">{{직함/포지셔닝 한 줄, 예: 업무자동화로 조직의 시간을 만드는 행정 전문가}}</div>
+  </div>
+  <div class="contact">
+    {{이메일}}<br>{{전화번호}}<br>{{총 경력 N년 · 현 소속}}
+  </div>
+</div>
+
+<div class="intro">
+  {{3줄 소개: ①한 문장 정체성 ②대표 성과 1개(숫자) ③지원 직무와의 연결}}
+</div>
+
+<div class="kpi-row no-break">
+  <!-- KPI 4개: 가장 강한 정량 성과. achievements.md에서 선별 -->
+  <div class="kpi"><div class="num">{{96h}}</div><div class="label">{{연간 업무시간 절감}}</div></div>
+  <div class="kpi"><div class="num">{{12건}}</div><div class="label">{{자동화 도구 구축}}</div></div>
+  <div class="kpi"><div class="num">{{120명}}</div><div class="label">{{도구 사용 직원}}</div></div>
+  <div class="kpi"><div class="num">{{80%}}</div><div class="label">{{오류율 감소}}</div></div>
+</div>
+
+<h2>핵심 역량</h2>
+<!-- 지원처 요구 역량 순서로 3개. 각 역량 = 주장 + 대표 성과 1줄 -->
+<div class="strength"><b>① {{역량 1}}</b> — {{대표 성과 한 줄 (카드 한 줄 요약 인용)}}</div>
+<div class="strength"><b>② {{역량 2}}</b> — {{대표 성과 한 줄}}</div>
+<div class="strength"><b>③ {{역량 3}}</b> — {{대표 성과 한 줄}}</div>
+
+<h2>경력 요약</h2>
+<table class="timeline">
+  <!-- 최신순 -->
+  <tr><td class="period">{{2023.03 ~ 현재}}</td><td><b>{{소속}}</b> · {{직무}} — {{핵심 업무 한 줄}}</td></tr>
+  <tr><td class="period">{{기간}}</td><td><b>{{소속}}</b> · {{직무}} — {{핵심 업무 한 줄}}</td></tr>
+</table>
+
+<!-- ==================== 2페이지: 프로젝트 총괄 ==================== -->
+<div class="page-break"></div>
+<h2>프로젝트 총괄</h2>
+<p class="muted">상세 내용은 다음 페이지 참조. 번호는 상세 페이지 순서와 동일.</p>
+<table class="matrix">
+  <tr><th style="width:6%">#</th><th style="width:30%">프로젝트</th><th style="width:14%">기간</th>
+      <th style="width:14%">역할</th><th>핵심 성과</th></tr>
+  <tr><td>1</td><td>{{프로젝트명}}</td><td>{{기간}}</td><td>{{역할}}</td><td>{{성과 한 줄, 숫자 포함}}</td></tr>
+  <!-- 카드 수만큼 반복 -->
+</table>
+
+<!-- ==================== 3페이지~: 프로젝트 상세 ==================== -->
+<div class="page-break"></div>
+<h2>프로젝트 상세</h2>
+
+<!-- 카드 1건 = .project 1개. 페이지당 2개 기준. no-break로 카드 중간 잘림 방지 -->
+<div class="project no-break">
+  <h3>1. {{프로젝트명}}</h3>
+  <div class="meta">{{기간}} · {{소속}} · 역할: {{역할/기여 비중}}</div>
+  <div class="block"><b class="tag">문제</b> {{S+T 요약: 어떤 문제가 있었고 무엇을 목표로 했나}}</div>
+  <div class="block"><b class="tag">행동</b> {{A: 내가 한 일, 도구·방법 구체적으로. 2~3문장}}</div>
+  <div class="result">
+    <b class="tag">성과</b> <span class="big">{{정량 성과 — 숫자 강조}}</span> · {{정성 성과}}<br>
+    <span class="muted">근거: {{I — 산출 방식/증빙}}</span>
+  </div>
+</div>
+
+<!-- ==================== 마지막 페이지 ==================== -->
+<div class="page-break"></div>
+<h2>스킬 · 도구</h2>
+<div class="tags">
+  <span>{{도구1}}</span><span>{{도구2}}</span><span>{{도구3}}</span>
+</div>
+
+<h2>교육 · 자격</h2>
+<table class="timeline">
+  <tr><td class="period">{{연도}}</td><td>{{자격/교육명}} — {{발급기관}}</td></tr>
+</table>
+
+</body>
+</html>

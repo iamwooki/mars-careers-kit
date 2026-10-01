@@ -1,0 +1,44 @@
+{
+ "_설명": "예시 — 김화성(가상 인물) 기준. 본인 기준으로 고쳐 쓴다: keywords(검색어), max_career_years(내 경력), exclude_any(제목·회사·지역에 있으면 제외), title_keywords/company_tiers/region_weights(가점). alio=true면 잡알리오(공공기관 채용정보)도 같이 긁는다.",
+ "keywords": [
+  "서비스 기획",
+  "PM",
+  "데이터 분석",
+  "AI 기획"
+ ],
+ "max_career_years": 5,
+ "exclude_entry": true,
+ "min_score": 2,
+ "exclude_any": [
+  "영업",
+  "인턴",
+  "계약직",
+  "10년",
+  "팀장급"
+ ],
+ "title_keywords": {
+  "기획": 3,
+  "PM": 2,
+  "데이터": 2,
+  "AI": 2
+ },
+ "company_tiers": {
+  "대기업": 3,
+  "그룹": 2
+ },
+ "badge_bonus": 2,
+ "region_weights": {
+  "서울": 2,
+  "경기": 1
+ },
+ "tag_keywords": {
+  "정규직": 1
+ },
+ "alio": true,
+ "alio_keywords": [
+  "경력",
+  "AI",
+  "디지털",
+  "데이터"
+ ]
+}

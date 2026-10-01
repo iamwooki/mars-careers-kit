@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{이름}} ({{영문이름}})</title>
+<meta name="description" content="{{포지셔닝 한 줄}}">
+<style>
+  /* 학계 CV 스타일 — 흰 배경, 단일 컬럼, 미니멀. 구조 변경 없이 내용만 치환 */
+  :root {
+    /* 주요색 #1a73e8 */
+    --text: #222; --muted: #767676; --link: #1a73e8;
+    --line: #dddddd; --bg: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --text: #d9dde3; --muted: #8f97a3; --link: #8ab4f8; --line: #333a45; --bg: #14171c; }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Pretendard", "Malgun Gothic", "맑은 고딕", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15.5px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 48px 24px 56px; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .profile { display: flex; gap: 28px; align-items: center; margin-bottom: 8px; }
+  .photo {
+    width: 128px; height: 128px; border-radius: 50%; flex-shrink: 0; object-fit: cover;
+    background: #e9edf2; color: #9aa4b0; display: flex; align-items: center;
+    justify-content: center; font-size: 2rem; font-weight: 600; letter-spacing: 1px;
+  }
+  @media (prefers-color-scheme: dark) { .photo { background: #232933; color: #5d6673; } }
+  .profile h1 { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.3px; }
+  .profile h1 .en { font-weight: 400; color: var(--muted); font-size: 1.15rem; margin-left: 8px; }
+  .profile .title { margin-top: 2px; }
+  .profile .affil { color: var(--muted); font-size: 0.95rem; }
+  .profile .contact { margin-top: 8px; font-size: 0.92rem; color: var(--muted); }
+
+  section { margin-top: 40px; }
+  h2 {
+    font-size: 1.05rem; font-weight: 700; letter-spacing: 0.3px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--line); margin-bottom: 14px;
+  }
+  .bio { max-width: 72ch; }
+
+  .entry { display: grid; grid-template-columns: 150px 1fr; gap: 6px 18px; margin-bottom: 12px; }
+  .entry .date { color: var(--muted); font-size: 0.9rem; padding-top: 2px; white-space: nowrap; }
+  .entry .body b { font-weight: 600; }
+  .entry .body .sub { color: var(--muted); font-size: 0.93rem; }
+
+  .proj { margin-bottom: 16px; }
+  .proj .name { font-weight: 600; }
+  .proj .date { color: var(--muted); font-size: 0.9rem; font-weight: 400; margin-left: 6px; }
+  .proj .desc { font-size: 0.95rem; }
+  .proj .result { font-size: 0.95rem; }
+  .proj .result::before { content: "— "; color: var(--muted); }
+
+  ul.plain { list-style: none; }
+  ul.plain li { margin-bottom: 6px; padding-left: 14px; text-indent: -14px; }
+  ul.plain li::before { content: "·"; margin-right: 8px; color: var(--muted); }
+
+  footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
+           font-size: 0.85rem; color: var(--muted); }
+
+  @media (max-width: 540px) {
+    .profile { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .entry { grid-template-columns: 1fr; gap: 0 0; }
+    .entry .date { padding-top: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="profile">
+    <!-- 사진 있으면: <img src="photo.jpg" class="photo" alt="{{이름}}"> / 없으면 이니셜 -->
+    <div class="photo">{{이니셜}}</div>
+    <div>
+      <h1>{{이름}}<span class="en">{{영문이름}}</span></h1>
+      <div class="title">{{직함/포지셔닝}}</div>
+      <div class="affil">{{소속 (공개 수준으로)}}</div>
+      <div class="contact">
+        <!-- 공개 가능 링크만. 전화번호 금지 -->
+        <a href="{{링크1_URL}}">{{링크1_라벨}}</a> ·
+        <a href="{{링크2_URL}}">{{링크2_라벨}}</a> ·
+        <span>{{공개 이메일}}</span>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <h2>About</h2>
+    <p class="bio">{{3~4문장 소개: 정체성 / 무엇을 왜 하는 사람인지 / 지금 관심사}}</p>
+  </section>
+
+  <section>
+    <h2>Experience</h2>
+    <!-- 최신순 -->
+    <div class="entry">
+      <div class="date">{{YYYY.MM – 현재}}</div>
+      <div class="body"><b>{{소속}}</b> · {{직무}}
+        <div class="sub">{{핵심 업무 한 줄}}</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Projects</h2>
+    <!-- confirmed 카드 중 공개 심사 통과분, 대표 4~6개 -->
+    <div class="proj">
+      <div class="name">{{프로젝트명}} <span class="date">{{연도}}</span></div>
+      <div class="desc">{{문제+행동 압축 1~2문장}}</div>
+      <div class="result">{{성과 한 줄 — 공개 가능 숫자만}}</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Skills</h2>
+    <ul class="plain">
+      <li>{{분류}}: {{항목들}}</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Education &amp; Certifications</h2>
+    <div class="entry">
+      <div class="date">{{연도}}</div>
+      <div class="body">{{학교/자격 — 기관}}</div>
+    </div>
+  </section>
+
+  <footer>Last updated {{YYYY-MM}} · Contact: {{공개 연락 수단}}</footer>
+
+</div>
+</body>
+</html>

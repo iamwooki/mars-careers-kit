@@ -1,0 +1,36 @@
+# 지원 현황 원장 (비공개) — 어디에 지원했고 결과가 무엇인지의 단일 원천
+# 고친 뒤:  python3 .claude/skills/job-apply/scripts/build_tracker.py .  → applications/지원현황.html (생성물)
+# 규칙
+#   - 비밀번호는 적지 않는다. 수험번호·접수번호까지만.
+#   - status: 준비중 | 제출 | 서류합격 | 서류탈락 | 필기합격 | 필기탈락 | 면접합격 | 면접탈락 | 최종합격 | 최종탈락 | 미지원 | 포기
+#   - stages: {name, date, result: 대기|합격|탈락|- , note}
+#   - submitted_facts: 지원서에 실제로 적어 낸 값 — 면접·다음 지원서와 어긋나지 않게
+#   - lessons: 결과 확인 후 회고 — 다음 지원서의 입력이 된다
+
+applications:
+  - id: 2026-H2-TERRA   # 예시 (가상의 회사)
+    org: 테라포밍 모빌리티
+    posting: 2026년 하반기 경력 채용
+    role: 서비스 기획 (PM)
+    track: 경력 3년 이상
+    status: 제출
+    submitted: 2026-09-10
+    exam_no: TM-00000
+    portal: https://example.com/careers
+    login_note: 비밀번호는 비밀번호 관리자에 보관, 이 파일에 적지 않음
+    folder: 테라포밍모빌리티_서비스기획
+    essay_version: 02_resume_final.md (제출 화면에서 고친 곳이 있으면 05_제출본이 기준)
+    stages:
+      - {name: 서류, date: "2026-09-24 발표", result: 대기}
+      - {name: 과제 전형, date: "", result: "-"}
+      - {name: 면접, date: "", result: "-"}
+    timeline:
+      - {date: 2026-09-03, event: "공고 분석, 문항별 경험 추천표 작성"}
+      - {date: 2026-09-10, event: "사실 검수·심사관 검수 후 제출"}
+    submitted_facts:
+      - "희망연봉: 회사 내규에 따름"
+      - "경력 1: ㈜레드샌드 로지스 / 서비스기획팀 / PM / 2021-03 ~ 재직중"
+    interview_prep:
+      - "문의 비중 38%→26%는 CS팀 집계 — 내가 직접 뽑은 숫자(61%, 4만 2천 건)와 구분해서 말한다"
+      - "정산 대시보드에서 외주 개발사와 나의 분담선"
+    lessons: ""

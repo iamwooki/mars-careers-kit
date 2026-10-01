@@ -1,0 +1,4 @@
+# 기본값: 전부 비공개. 공개할 것은 site/ 만 따로 저장소로 올린다.
+evidence/
+*.DS_Store
+__pycache__/

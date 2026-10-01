@@ -1,0 +1,25 @@
+name: jobs-radar
+on:
+  schedule:
+    - cron: '30 22 * * *'   # 매일 07:30 KST (UTC 22:30)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: crawl + build page
+        run: |
+          python3 jobs/crawl.py
+          python3 jobs/build_page.py --analytics
+      - name: commit data
+        run: |
+          # Vercel Git 연동은 커밋 작성자가 프로젝트 소유자여야 배포한다(아니면 BLOCKED) → 소유자 계정으로 커밋
+          git config user.name "YOUR_GITHUB_ID"; git config user.email "YOUR_GITHUB_EMAIL"
+          git add jobs/data/jobs.json public/jobs/
+          git diff --cached --quiet || git commit -m "jobs: $(date -u +%F) crawl"
+          git push
