@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 """지원처 분석보고서 HTML 빌더.
-사용: python build_report.py applications/{지원처}_{직무} [--out 경로] [--resume 파일]
-입력: 00_target.md, 02_resume_final.md(없으면 최신 01_resume_draft*.md), _workspace/review_*.md(review_target이 이 폴더를 가리키는 것)
+사용: python build_report.py applications/{지원처}_{직무} [--out 경로] [--resume 파일] [--materials 파일] [--compare 파일] [--summary 파일]
+입력: 00_target.md, 00_materials.md(있으면 재료 절), 02_resume_final.md(없으면 최신 01_resume_draft*.md, 둘 다 없으면 '초안 미작성' 표시), _workspace/review_*.md(review_target이 이 폴더를 가리키는 것),
+      문항별_비교.html(build_compare.py 생성물 — 있으면 'ChatGPT 대조' 절), 04_소재정리.md(있으면 '핵심 소재 정리' 절). 둘 다 없으면 보고서는 이전과 같다.
 출력: {폴더}/{지원처}_분석보고서.html — 생성물이므로 직접 수정하지 말고 md를 고친 뒤 재빌드."""
 import re, sys, os, glob, html, datetime
 sys.path.insert(0, os.path.dirname(__file__))
 from charcount import sections as resume_sections, measure
+
+def opt_file(args, flag, default):
+    """--flag 경로가 있으면 그것, 없으면 기본 경로. 파일이 없으면 None."""
+    p = args[args.index(flag) + 1] if flag in args else default
+    return p if os.path.exists(p) else None
 
 # ---------- 최소 마크다운 변환 (외부 라이브러리 없음) ----------
 def inline(s):
@@ -136,8 +142,26 @@ def main():
     target = open(os.path.join(app, '00_target.md'), encoding='utf-8').read()
     if not resume:
         cands = [os.path.join(app, '02_resume_final.md')] + sorted(glob.glob(os.path.join(app, '01_resume_draft*.md')), reverse=True)
-        resume = next(p for p in cands if os.path.exists(p))
-    rmd = open(resume, encoding='utf-8').read()
+        resume = next((p for p in cands if os.path.exists(p)), None)
+    rmd = open(resume, encoding='utf-8').read() if resume else None
+    # 재료 추천표(Phase 3.5): 있으면 분석 뒤에 붙인다
+    mpath = args[args.index('--materials') + 1] if '--materials' in args else os.path.join(app, '00_materials.md')
+    materials = open(mpath, encoding='utf-8').read() if os.path.exists(mpath) else None
+    # ChatGPT 대조 비교표(Phase 4.5)·핵심 소재 정리(Phase 7): 파일이 있을 때만 싣는다
+    cpath = opt_file(args, '--compare', os.path.join(app, '문항별_비교.html'))
+    spath = opt_file(args, '--summary', os.path.join(app, '04_소재정리.md'))
+    cmp_html = sum_html = ''; cmp_css = ''
+    if cpath:
+        m = re.search(r'<!--cmp:begin-->(.*?)<!--cmp:end-->', open(cpath, encoding='utf-8').read(), flags=re.S)
+        if m:
+            from build_compare import CSS as cmp_css
+            inner = m.group(1)
+        else:  # 손으로 만든 비교표 등 조각 표식이 없는 파일은 링크만 건다
+            inner = f'<p><a href="{html.escape(os.path.basename(cpath))}">{html.escape(os.path.basename(cpath))}</a> (따로 열기)</p>'
+        cmp_html = f'<section class="block" id="compare"><h2>ChatGPT 대조 — {html.escape(os.path.basename(cpath))}</h2><div class="callout"><b>대조용.</b> 다른 모델이 같은 재료로 쓴 판을 나란히 놓은 것입니다. 사실의 출처가 아니며, 가져온 문장은 사실 검수를 거칩니다.</div>{inner}</section>'
+    if spath:
+        sbody = md_to_html(re.sub(r'^# .*\n', '', open(spath, encoding='utf-8').read(), count=1), shift=1)
+        sum_html = f'<section class="block" id="summary"><h2>핵심 소재 정리 — {html.escape(os.path.basename(spath))}</h2><div class="md">{sbody}</div></section>'
     title = re.search(r'^# (.*)', target, flags=re.M).group(1).split(' — ')[0]
     # 리뷰: review_target 이 이 폴더를 가리키는 파일
     reviews = []
@@ -151,21 +175,31 @@ def main():
         head, rest = s.split('\n', 1)
         nav.append(f'<a href="#t{k}">{inline(head[:28])}</a>')
         body.append(f'<section class="block" id="t{k}"><h2>{inline(head)}</h2><div class="md">{md_to_html(rest, shift=0)}</div></section>')
+    mat_html = ''
+    if materials:
+        nav.append('<div class="grp">재료</div><a href="#materials">경험 추천표</a>')
+        mbody = md_to_html(re.sub(r'^# .*\n', '', materials, count=1), shift=1)
+        mat_html = f'<section class="block" id="materials"><h2>문항별 경험 추천표 — 00_materials.md</h2><div class="callout"><b>선택 대기.</b> 초안은 이 표에서 고른 조합으로만 씁니다. 문항마다 [내 선택]에 후보 번호와 하고 싶은 말을 적어 주세요.</div><div class="md">{mbody}</div></section>'
+    if cmp_html: nav.append('<div class="grp">대조</div><a href="#compare">ChatGPT 대조</a>')
     nav.append('<div class="grp">자기소개서</div><a href="#resume">자소서 본문</a>')
     if reviews: nav.append('<div class="grp">검수</div><a href="#reviews">검수 리포트</a>')
-    res_html = f'<section class="block" id="resume"><h2>자기소개서 — {html.escape(os.path.basename(resume))}</h2><div class="callout"><b>제출 전 필독.</b> 글자수는 공백 포함 기준이며 공고 원문의 기준(공백 포함/제외, 줄바꿈 산입)을 확인해야 합니다. <mark>【 】</mark>는 사용자 입력이 필요한 자리이며 채우기 전에는 제출할 수 없습니다.</div>{resume_articles(rmd)}</section>'
+    if sum_html: nav.append('<div class="grp">정리</div><a href="#summary">핵심 소재 정리</a>')
+    if rmd is not None:
+        res_html = f'<section class="block" id="resume"><h2>자기소개서 — {html.escape(os.path.basename(resume))}</h2><div class="callout"><b>제출 전 필독.</b> 글자수는 공백 포함 기준이며 공고 원문의 기준(공백 포함/제외, 줄바꿈 산입)을 확인해야 합니다. <mark>【 】</mark>는 사용자 입력이 필요한 자리이며 채우기 전에는 제출할 수 없습니다.</div>{resume_articles(rmd)}</section>'
+    else:
+        res_html = '<section class="block" id="resume"><h2>자기소개서</h2><div class="callout"><b>초안 미작성.</b> 채용분야·문항·재료 선택이 확정되면 초안을 쓰고 이 자리에 붙입니다.</div></section>'
     rev_html = ''
     if reviews:
         rev_html = '<section class="block" id="reviews"><h2>검수 리포트</h2>' + ''.join(
             f'<details class="review"{" open" if "심사관" in fn else ""}><summary>{html.escape(fn)}</summary><div class="md">{md_to_html(re.sub(r"^---.*?---", "", t, count=1, flags=re.S), shift=1)}</div></details>' for fn, t in reviews) + '</section>'
     today = datetime.date.today().isoformat()
-    page = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{html.escape(title)} 분석 보고서</title><style>{CSS}</style></head><body><div class="wrap">
-<header class="top"><h1>{html.escape(title)} 지원 분석 보고서</h1><p class="sub">생성 {today} · 원천: 00_target.md · {html.escape(os.path.basename(resume))} · 검수 {len(reviews)}건 — 이 HTML은 생성물입니다. 수정은 md에서.</p></header>
-<div class="layout"><nav class="toc">{''.join(nav)}</nav><main>{''.join(body)}{res_html}{rev_html}</main></div>
+    page = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{html.escape(title)} 분석 보고서</title><style>{CSS}{cmp_css}</style></head><body><div class="wrap">
+<header class="top"><h1>{html.escape(title)} 지원 분석 보고서</h1><p class="sub">생성 {today} · 원천: 00_target.md · {html.escape(os.path.basename(resume)) if resume else '자소서 초안 없음'} · 검수 {len(reviews)}건 — 이 HTML은 생성물입니다. 수정은 md에서.</p></header>
+<div class="layout"><nav class="toc">{''.join(nav)}</nav><main>{''.join(body)}{mat_html}{cmp_html}{res_html}{rev_html}{sum_html}</main></div>
 <footer><p>build_report.py · {html.escape(app)}</p></footer></div><script>{JS}</script></body></html>'''
     out = out or os.path.join(app, f'{name.split("_")[0]}_분석보고서.html')
     open(out, 'w', encoding='utf-8').write(page)
-    print('written', out, f'({len(page)//1024} KB, 분석 절 {len(secs)}, 문항 {len(resume_sections(rmd))}, 검수 {len(reviews)})')
+    print('written', out, f'({len(page)//1024} KB, 분석 절 {len(secs)}, 문항 {len(resume_sections(rmd)) if rmd else 0}, 재료표 {"있음" if materials else "없음"}, 검수 {len(reviews)}' + (', 비교표 있음' if cmp_html else '') + (', 소재정리 있음' if sum_html else '') + ')')
 
 if __name__ == '__main__':
     main()

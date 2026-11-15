@@ -46,11 +46,12 @@ description: >
 
 ## Phase 3: 지원처 분석 — 실행 모드: 서브 에이전트 (career-analyst)
 
-**위임 규칙 (보조 산출물)**: "카드에 뭐가 부족해 / 내가 뭘 더 채워야 하지 / 빈칸 점검"은 `career-inventory`의 갭 분석 페이지(gap.yaml → gap_report.html), "내가 어떤 사람인지 정리해줘 / 나를 요약해줘 / 어떤 자리에 맞을까"는 `self-profile` 스킬(self-profile.yaml → self-profile.html)에 위임한다. 둘 다 비공개 내부 문서다.
+**위임 규칙 (보조 산출물)**: "카드에 뭐가 부족해 / 내가 뭘 더 채워야 하지 / 빈칸 점검"은 `career-inventory`의 갭 분석 페이지(gap.yaml → gap_report.html), "내가 어떤 사람인지 정리해줘 / 나를 요약해줘 / 어떤 자리에 맞을까"는 `self-profile` 스킬(self-profile.yaml → self-profile.html)에, "인간관계도 / 사람 카드 / 이 사람 기록해줘 / OO팀 사람들 정리"는 `people-graph` 스킬(people/people.yaml → people/people.html, 연락처 금지)에 위임한다. 셋 다 비공개 내부 문서다.
 
 **사용자가 공고(직무기술서)와 자소서 문항을 함께 제공하면 Phase 3~4 전체를 `job-apply` 스킬에 위임한다.**
-job-apply는 입력 정규화(00_input.md) → 분석(00_target.md) → 재료 확인 게이트 → 초안 → 사실 검수 + 심사관 검수
-(screener-review) → 개정판 → 분석보고서 HTML(build_report.py)까지를 지원서 한 건 단위로 표준화한 파이프라인이다.
+job-apply는 입력 정규화(00_input.md) → 분석(00_target.md) → 재료 확인 게이트 → 장면 재발굴·경험 추천(00_materials.md) → 초안
+→ ChatGPT 대조(문항별_비교.html) → 사실 검수 ‖ 심사관 검수(screener-review, 병렬·독립) → 개정판·윤문 → 소재정리(04_소재정리.md)
+→ 분석보고서 HTML(build_report.py)까지를 지원서 한 건 단위로 표준화한 파이프라인이다. 총괄과 사용자 승인 게이트는 메인 세션이 맡는다.
 아래 Phase 3·4 서술은 포트폴리오를 함께 만들거나 job-apply 범위 밖의 조합이 필요할 때의 기준이다.
 
 지원처가 정해진 경우만. 공고 텍스트/URL을 받아 career-analyst가 `00_target.md`
@@ -66,9 +67,9 @@ job-apply는 입력 정규화(00_input.md) → 분석(00_target.md) → 재료 �
      마스킹 확인 목록과 git push는 리더가 사용자 승인 후 처리 (푸시 = 공개 발행)
    - T3 자소서 검수 (quality-reviewer, T1 의존)
    - T4 포트폴리오 검수 (quality-reviewer, T2 의존)
-   - T5 수정 반영 (각 작성자, T3/T4 의존)
-3. 검수→수정 왕복은 최대 2라운드. 미해결 쟁점은 리더가 수합해 사용자 판단으로 넘긴다.
-   자소서 검수는 사실 검수(T3) 뒤에 **심사관 검수(screener-review)** 를 한 회차 더 둔다 — 사실이 맞아도 떨어지는 이유를 잡기 위해.
+   - T5 수정 반영 (각 작성자, T3/T4 의존 — 리더가 대조해 만든 반영 목록으로)
+3. 검수→수정은 최대 2라운드. 검수자는 리더에게만 보고하고 작성자와 직접 주고받지 않는다. 미해결 쟁점은 리더가 수합해 사용자 판단으로 넘긴다.
+   자소서 검수는 사실 검수(T3)와 **심사관 검수(screener-review)** 를 **동시에, 서로 모르게** 돌린다 — 사실이 맞아도 떨어지는 이유를 따로 잡기 위해. 리더가 두 리포트를 대조한다(job-apply Phase 5와 같은 방식).
 4. 팀 정리 후 리더가 최종본을 확정: `02_resume_final.md`, `portfolio.pdf`
 5. 자소서만 또는 포트폴리오만 요청이면 해당 작성자 + 검수자 2인 팀으로 축소.
    **단일 산출물 + 수정 1건 같은 경량 작업이면 팀 없이 서브 에이전트 1회 호출로 대체** (팀 오버헤드 회피).

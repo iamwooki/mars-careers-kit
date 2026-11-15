@@ -51,9 +51,12 @@ def render(d):
             link = '\n        <div class="plink"><a href="%s" target="_blank" rel="noopener">홈페이지 바로가기 ↗</a></div>' % pr['url']
         # links 목록이 있으면 항목별 링크 (보고서·산출물 등)
         if pr.get('links'):
+            # archive(선택): site/archive/ 사본 경로 — 있으면 '원문 ↗ · 사본'으로 병기 
             link += ''.join(
-                '\n        <div class="plink"><a href="%s" target="_blank" rel="noopener">%s ↗</a></div>'
-                % (l['url'], esc(l['label'])) for l in pr['links'])
+                '\n        <div class="plink"><a href="%s" target="_blank" rel="noopener">%s ↗</a>%s</div>'
+                % (l['url'], esc(l['label']),
+                   (' <span class="alt">· <a href="%s" target="_blank" rel="noopener">사본</a></span>' % l['archive']) if l.get('archive') else '')
+                for l in pr['links'])
         # role(선택): 접힘 상태 둘째 줄의 '역할 · 핵심 성과' 중 역할 
         role = '<span class="role">%s</span>' % esc(pr['role']) if pr.get('role') else ''
         projs.append('''    <details class="proj">
@@ -112,10 +115,12 @@ def render(d):
             issuer = ''
             if e.get('issuer'):
                 issuer = ' <span class="sub" style="display:inline; color:var(--muted); font-size:0.93rem; margin-left:8px;">%s</span>' % esc(e['issuer'])
+            # logo(선택): body형 항목에도 기관 엠블럼 허용 (2026-10-12, 병역 부대 마크에 첫 적용)
+            blogo = '<img src="%s" class="orglogo" alt="">' % e['logo'] if e.get('logo') else ''
             edu.append('''    <div class="entry">
       <div class="date">%s</div>
-      <div class="body">%s%s</div>
-    </div>''' % (esc(e['date']), esc(e['body']), issuer))
+      <div class="body">%s%s%s</div>
+    </div>''' % (esc(e['date']), blogo, esc(e['body']), issuer))
 
     # 링크 미리보기(카카오톡·슬랙 등) — meta.url + meta.og_image가 있을 때만 출력
     og = ''
@@ -174,7 +179,7 @@ TEMPLATE = '''<!DOCTYPE html>
     font-family: "Pretendard", "Malgun Gothic", "맑은 고딕", "Helvetica Neue", Arial, sans-serif;
     background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15.5px;
     -webkit-font-smoothing: antialiased;
-    /* 어절 보존 + 줄글 문단은 양쪽 정렬 — 단어 안 잘리고 오른쪽도 반듯 */
+    /* 어절 보존(keep-all). 양쪽 정렬은 좁은 화면에서 단어 간격이 벌어져 2026-10-27 제거 */
     word-break: keep-all; overflow-wrap: break-word;
   }
   /* 폭 820→900, 타이포 위계·섹션 여백 강화 */
@@ -201,7 +206,7 @@ TEMPLATE = '''<!DOCTYPE html>
     font-size: 1.35rem; font-weight: 700; letter-spacing: -0.2px;
     padding-bottom: 9px; border-bottom: 1px solid var(--line); margin-bottom: 20px;
   }
-  .bio { text-align: justify; font-size: 1rem; }
+  .bio { font-size: 1rem; }
 
   .entry { display: grid; grid-template-columns: 140px 1fr; gap: 8px 22px; margin-bottom: 20px; }
   .entry .date { color: var(--muted); font-size: 0.9rem; padding-top: 2px; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -234,10 +239,11 @@ TEMPLATE = '''<!DOCTYPE html>
   .proj .gist { color: var(--muted); font-size: 0.92rem; }
   .aside { color: var(--muted); margin-left: 10px; }
   .proj .pbody { padding: 0 0 16px 26px; }
-  .proj .desc { font-size: 0.95rem; text-align: justify; margin-bottom: 6px; }
+  .proj .desc { font-size: 0.95rem; margin-bottom: 6px; }
   .proj .result { font-size: 0.95rem; }
   .proj .result::before { content: "· "; color: var(--muted); }
   .proj .plink { font-size: 0.9rem; margin-top: 4px; }
+  .proj .plink .alt { color: var(--muted, #767676); }
 
   ul.plain { list-style: none; }
   ul.plain li { margin-bottom: 8px; padding-left: 14px; text-indent: -14px; }

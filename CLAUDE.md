@@ -8,7 +8,7 @@
 **트리거:**
 - 경력 정리·자소서·포트폴리오·지원서 관련 요청 → `career-orchestrator` 스킬
 - "내가 했던 일 정리하고 싶어", "경력 카드 추가/수정" → `career-inventory` 스킬 (인터뷰로 끌어낸다)
-- 공고(직무기술서)+자소서 문항을 함께 주면 → `job-apply` 스킬 (분석 → 경험 추천 → 사용자 선택 → 작성 → 사실 검수 → 심사관 검수 → 보고서 HTML)
+- 공고(직무기술서)+자소서 문항을 함께 주면 → `job-apply` 스킬 (분석 → 장면 찾기·경험 추천 → 사용자 선택 → 작성 → ChatGPT 판과 비교(선택) → 사실 검수와 심사관 검수를 따로 → 소재 정리 한 장 → 보고서 HTML)
 - "심사관/면접관 관점으로 봐줘" → `screener-review` 스킬
 - "카드에 뭐가 부족해 / 내가 뭘 더 채워야 하지 / 빈칸 점검" → `career-inventory`의 갭 분석 (inventory/gap.yaml → gap_report.html)
 - "내가 어떤 사람인지 정리해줘 / 나를 요약해줘 / 어떤 자리에 맞을까" → `self-profile` 스킬 (self-profile.yaml → self-profile.html)
